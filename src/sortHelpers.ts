@@ -1,10 +1,27 @@
 import type { IParseResult, IStringType, IParsedEntry } from './types';
 
 import { ECurrentParsedType } from './constants';
-import { testFunction, INPUTS_MOCKS } from './mockups';
 
-const wrapJsonObject = (entries: IParsedEntry[]) =>
-  `{\n${entries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
+const generateNTabs = (n: number) => Array.from({ length: n }, () => '\t').join('');
+
+const wrapJsonObject = (entries: IParsedEntry[], tabCount: number) => {
+  const tabString = generateNTabs(tabCount);
+  const tabStringCloser = generateNTabs(tabCount - 1);
+
+  return `{\n${entries.map(({ key, value }) => `${tabString}${key}: ${value},\n`).join('')}${tabStringCloser}}`;
+};
+
+const sortJsonEntries = (parsedEntries: IParsedEntry[]) => {
+  return parsedEntries.sort((a, b) => {
+    if (a.key < b.key) {
+      return -1;
+    }
+    if (a.key > b.key) {
+      return 1;
+    }
+    return 0;
+  });
+};
 
 const parseObjectLine = (line: string, overrideValue?: string): IParsedEntry | null => {
   const [key, ...values] = line.split(':');
@@ -43,13 +60,13 @@ export const decideType = (lines: string[], index: number): IStringType => {
   return { type: ECurrentParsedType.UNKNOWN, value };
 };
 
-const parseParseType = (lines: string[], startAt: number = 0): IParseResult => {
+const parseParseType = (lines: string[], startAt: number = 0, tabCount: number = 1): IParseResult => {
   const { type, value } = decideType(lines, startAt);
   lines[startAt] = value;
 
   switch (type) {
     case ECurrentParsedType.JSON: {
-      return parseAndSortJson(lines, startAt);
+      return parseAndSortJson(lines, startAt, tabCount);
     }
     case ECurrentParsedType.ARRAY: {
       return { value, endAt: startAt };
@@ -60,28 +77,16 @@ const parseParseType = (lines: string[], startAt: number = 0): IParseResult => {
   }
 };
 
-const sortJsonEntries = (parsedEntries: IParsedEntry[]) => {
-  return parsedEntries.sort((a, b) => {
-    if (a.key < b.key) {
-      return -1;
-    }
-    if (a.key > b.key) {
-      return 1;
-    }
-    return 0;
-  });
-};
-
-export const parseAndSortJson = (lines: string[], startAt: number): IParseResult => {
+export const parseAndSortJson = (lines: string[], startAt: number, tabCount: number = 1): IParseResult => {
   let i = startAt;
   let isClosedObject = false;
   const parsedEntries: IParsedEntry[] = [];
 
   for (; i < lines.length; i++) {
     const currLine = lines[i];
-    const { endAt, value } = parseParseType(lines, i);
+    const { endAt, value } = parseParseType(lines, i, tabCount + 1);
 
-    const currEntry = (i !== endAt) ? parseObjectLine(currLine,value) : parseObjectLine(currLine);
+    const currEntry = i !== endAt ? parseObjectLine(currLine, value) : parseObjectLine(currLine);
 
     i = endAt;
 
@@ -101,15 +106,31 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
 
   return {
     endAt: i,
-    value: wrapJsonObject(sortedEntries),
+    value: wrapJsonObject(sortedEntries, tabCount),
   };
 };
 
 export const parseMakeupJson = (input: string): string => {
-  const lines = input.split(',\n').map((line) => line.replace(/[\n\t\s]/g, '').trim());
+  const lines = input.split(',\n');
+  const firstLine = lines[0];
 
-  const { value } = parseParseType(lines);
+  if (!firstLine) throw new Error('Invalid JSON object'); 
+  
+  const firstPart = firstLine.split('\n')[1];
+
+  if (!firstPart) throw new Error('Invalid JSON object');
+  let tabCount = 0;
+
+  for (let i = 0; i < firstPart.length; i++) {
+    if (firstPart[i] === ' ') {
+      tabCount++;
+    } else {
+      break;
+    }
+  }
+
+  const trimmedLines = lines.map((line) => line.replace(/[\n\t\s]/g, '').trim());
+
+  const { value } = parseParseType(trimmedLines);
   return value;
 };
-
-testFunction(INPUTS_MOCKS.NESTED_OBJ, parseMakeupJson);
