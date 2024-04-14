@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { parseAndSortJson } from './sortHelpers';
+import { parseMakeupJson } from './sortHelpers';
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "json-markup-sort" is now active!');
@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
         const selection = editor.selection;
         const highlightedText = document.getText(selection);
 
-        const sortedJson = parseAndSortJson(highlightedText);
+        const sortedJson = parseMakeupJson(highlightedText);
 
         editor.edit((editBuilder) => {
           editBuilder.replace(selection, sortedJson);

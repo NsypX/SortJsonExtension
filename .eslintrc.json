@@ -6,24 +6,12 @@
     "sourceType": "module",
     "ecmaVersion": 2019
   },
-  "ignorePatterns": [
-    "**/node_modules/**",
-    "**/*coverage*/**",    
-    "**/vendor/**",
-    "**/.build/**",
-    "/.vscode",
-    "!/.jest"
-  ],
+  "ignorePatterns": ["**/node_modules/**", "**/*coverage*/**", "**/vendor/**", "**/.build/**", "/.vscode", "!/.jest"],
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint"
-  ],
+  "plugins": ["@typescript-eslint"],
   "settings": {
     "import/parsers": {
-      "@typescript-eslint/parser": [
-      ".ts",
-      ".tsx"
-    ]
+      "@typescript-eslint/parser": [".ts", ".tsx"]
     },
     "import/resolver": {
       "node": {
@@ -37,14 +25,15 @@
     "jest": true
   },
   "rules": {
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
-    "semi": ["error", "always"],    
+    "semi": ["error", "always"],
     "object-curly-spacing": ["error", "always"],
     "object-property-newline": ["error", { "allowAllPropertiesOnSameLine": true }],
     "space-infix-ops": ["error", { "int32Hint": false }],
     "no-multi-spaces": ["error"],
-    "no-multiple-empty-lines": ["error", { "max": 1 }] 
+    "no-multiple-empty-lines": ["error", { "max": 1 }],
+    "switch-colon-spacing": ["error", { "after": true, "before": false }]
   }
 }

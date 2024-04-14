@@ -1,20 +1,7 @@
 import { ECurrentParsedType, IStringType, type IParsedEntry } from './types';
 
-const checkIfJsonReturnKeys = (input: string): string => {
-  const trimmed = input.trim();
-
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-    const retVal = trimmed.slice(1, -1);
-    return retVal;
-  }
-
-  throw new Error('Not a valid JSON');
-};
-
-export const parseAndSortJson = (input: string) => {
-  const keysAndValues = checkIfJsonReturnKeys(input);
-
-  const lines = keysAndValues.split(',\n').map((line) => line.replace(/[\n\t\s]/g, '').trim());
+export const parseAndSortJson = (inputLines: string[]) => {
+  const lines = inputLines.map((line) => line.replace(/[\n\t\s]/g, '').trim());
 
   const parsedEntries = lines
     .map((line) => {
@@ -47,17 +34,34 @@ export const parseAndSortJson = (input: string) => {
 export const decideType = (lines: string[], index: number): IStringType => {
   const currLine = lines[index];
 
-  const isKeyValue = currLine.indexOf(':') === -1;
+  const value = currLine.trim();
 
-  const value = isKeyValue ? currLine.trim() : currLine.split(':')[1].trim();
+  const removeFirstChar = value.substring(1);
+  
+  if (value.startsWith('{')) return { type: ECurrentParsedType.JSON, value: removeFirstChar };
 
-  if (value.startsWith('{')) return { type: ECurrentParsedType.JSON, value:value.slice(1, -1) };
+  if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value: removeFirstChar };
 
-  if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value:value.slice(1, -1) };
-
-  return { type:ECurrentParsedType.UNKNOWN,value };
+  return { type: ECurrentParsedType.UNKNOWN, value };
 };
 
 export const parseMakeupJson = (input: string) => {
-  const lines = input.split('\n');
+  const lines = input.split(',\n');
+
+  const startAt = 0;
+  const { type, value } = decideType(lines, startAt);
+  lines[startAt] = value;
+
+  switch (type) {
+    case ECurrentParsedType.JSON: {
+      return parseAndSortJson(lines);
+    }
+    case ECurrentParsedType.ARRAY: {
+      return value;
+    }
+    case ECurrentParsedType.UNKNOWN: {
+      return value;
+    }
+  }
+
 };
