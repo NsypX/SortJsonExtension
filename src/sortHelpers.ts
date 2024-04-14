@@ -30,7 +30,7 @@ const parseObjectLine = (line: string, overrideValue?: string): IParsedEntry | n
     return null;
   }
 
-  const value = values.join(':').replace('}', '');
+  const value = values.join(':');
 
   return { key, value: overrideValue || value };
 };
