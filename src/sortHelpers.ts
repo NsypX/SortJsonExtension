@@ -1,6 +1,7 @@
 import type { IParseResult, IStringType, IParsedEntry } from './types';
 
 import { ECurrentParsedType } from './constants';
+import { testFunction, INPUTS_MOCKS } from './mockups';
 
 const wrapJsonObject = (entries: IParsedEntry[]) =>
   `{\n${entries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
@@ -95,3 +96,5 @@ export const parseMakeupJson = (input: string) => {
 
   return parseParseType(lines);
 };
+
+testFunction(INPUTS_MOCKS.SIMPLE_OBJ, parseMakeupJson);

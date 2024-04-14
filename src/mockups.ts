@@ -11,6 +11,7 @@ export const INPUTS_MOCKS:Record<string,ITestsParams> = {
 export const testFunction = (testParams:ITestsParams, fn: (input: string) => string) => {
   const { input, expectedValue } = testParams;
   const result = fn(input);
+  
   if (result !== expectedValue) {
     throw new Error(`Expected ${expectedValue} but got ${result}`);
   }
