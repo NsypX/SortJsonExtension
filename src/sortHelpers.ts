@@ -14,13 +14,27 @@ const parseObjectLine = (line: string): IParsedEntry | null => {
   return { key, value };
 };
 
+export const decideType = (lines: string[], index: number): IStringType => {
+  const currLine = lines[index];
+
+  const value = currLine.trim();
+
+  const removeFirstChar = value.substring(1);
+
+  if (value.startsWith('{')) return { type: ECurrentParsedType.JSON, value: removeFirstChar };
+
+  if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value: removeFirstChar };
+
+  return { type: ECurrentParsedType.UNKNOWN, value };
+};
+
 const parseParseType = (lines: string[], startAt: number = 0): string => {
   const { type, value } = decideType(lines, startAt);
   lines[startAt] = value;
 
   switch (type) {
     case ECurrentParsedType.JSON: {
-      const { value } = parseAndSortJson(lines, 0);
+      const { value } = parseAndSortJson(lines, startAt);
 
       return value;
     }
@@ -72,20 +86,6 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
     endAt: i,
     value: wrapJsonObject(sortedEntries),
   };
-};
-
-export const decideType = (lines: string[], index: number): IStringType => {
-  const currLine = lines[index];
-
-  const value = currLine.trim();
-
-  const removeFirstChar = value.substring(1);
-
-  if (value.startsWith('{')) return { type: ECurrentParsedType.JSON, value: removeFirstChar };
-
-  if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value: removeFirstChar };
-
-  return { type: ECurrentParsedType.UNKNOWN, value };
 };
 
 export const parseMakeupJson = (input: string) => {
