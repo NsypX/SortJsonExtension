@@ -13,3 +13,8 @@ export interface IStringType {
     type: ECurrentParsedType;
     value: string;
 }
+
+export interface IParseResult {
+    endAt: number;
+    value: string;
+}
