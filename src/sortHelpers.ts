@@ -79,7 +79,6 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
 
   for (; i < lines.length; i++) {
     const currLine = lines[i];
-    
     const { endAt, value } = parseParseType(lines, i);
 
     const currEntry = (i !== endAt) ? parseObjectLine(currLine,value) : parseObjectLine(currLine);
