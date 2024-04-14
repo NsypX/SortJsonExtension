@@ -1,4 +1,4 @@
-import type { IParsedEntry } from './types';
+import { ECurrentParsedType, IStringType, type IParsedEntry } from './types';
 
 const checkIfJsonReturnKeys = (input: string): string => {
   const trimmed = input.trim();
@@ -42,4 +42,22 @@ export const parseAndSortJson = (input: string) => {
   const retVal = `{\n${sortedEntries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
 
   return retVal;
+};
+
+export const decideType = (lines: string[], index: number): IStringType => {
+  const currLine = lines[index];
+
+  const isKeyValue = currLine.indexOf(':') === -1;
+
+  const value = isKeyValue ? currLine.trim() : currLine.split(':')[1].trim();
+
+  if (value.startsWith('{')) return { type: ECurrentParsedType.JSON, value:value.slice(1, -1) };
+
+  if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value:value.slice(1, -1) };
+
+  return { type:ECurrentParsedType.UNKNOWN,value };
+};
+
+export const parseMakeupJson = (input: string) => {
+  const lines = input.split('\n');
 };
