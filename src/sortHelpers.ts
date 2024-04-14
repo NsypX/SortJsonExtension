@@ -1,8 +1,6 @@
 import { ECurrentParsedType, IStringType, type IParsedEntry } from './types';
 
-export const parseAndSortJson = (inputLines: string[]) => {
-  const lines = inputLines.map((line) => line.replace(/[\n\t\s]/g, '').trim());
-
+export const parseAndSortJson = (lines: string[]) => {
   const parsedEntries = lines
     .map((line) => {
       const [key, ...values] = line.split(':');
@@ -46,7 +44,7 @@ export const decideType = (lines: string[], index: number): IStringType => {
 };
 
 export const parseMakeupJson = (input: string) => {
-  const lines = input.split(',\n');
+  const lines = input.split(',\n').map((line) => line.replace(/[\n\t\s]/g, '').trim());
 
   const startAt = 0;
   const { type, value } = decideType(lines, startAt);
