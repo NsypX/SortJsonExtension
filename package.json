@@ -40,6 +40,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.88.0",
@@ -48,6 +49,7 @@
     "@vscode/test-cli": "^0.0.8",
     "@vscode/test-electron": "^2.3.9",
     "eslint": "^8.53.0",
+    "jest": "^29.7.0",
     "typescript": "^5.3.3"
   }
 }
