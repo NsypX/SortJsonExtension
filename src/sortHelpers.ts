@@ -1,5 +1,8 @@
 import { ECurrentParsedType, IParseResult, IStringType, type IParsedEntry } from './types';
 
+const wrapJsonObject = (entries: IParsedEntry[]) =>
+  `{\n${entries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
+
 const parseObjectLine = (line: string): IParsedEntry | null => {
   const [key, ...values] = line.split(':');
   if (values.length === 0) {
@@ -9,6 +12,25 @@ const parseObjectLine = (line: string): IParsedEntry | null => {
   const value = values.join(':').replace('}', '');
 
   return { key, value };
+};
+
+const parseParseType = (lines: string[], startAt: number = 0): string => {
+  const { type, value } = decideType(lines, startAt);
+  lines[startAt] = value;
+
+  switch (type) {
+    case ECurrentParsedType.JSON: {
+      const { value } = parseAndSortJson(lines, 0);
+
+      return value;
+    }
+    case ECurrentParsedType.ARRAY: {
+      return value;
+    }
+    case ECurrentParsedType.UNKNOWN: {
+      return value;
+    }
+  }
 };
 
 const sortJsonEntries = (parsedEntries: IParsedEntry[]) => {
@@ -23,19 +45,7 @@ const sortJsonEntries = (parsedEntries: IParsedEntry[]) => {
   });
 };
 
-export const parseAndSortJson = (lines: string[]) => {
-  const parsedEntries = lines
-    .map((line) => parseObjectLine(line))
-    .filter(Boolean) as IParsedEntry[];
-
-  const sortedEntries = sortJsonEntries(parsedEntries);
-
-  const retVal = `{\n${sortedEntries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
-
-  return retVal;
-};
-
-export const parseJsonObject = (lines: string[], startAt: number): IParseResult => {
+export const parseAndSortJson = (lines: string[], startAt: number): IParseResult => {
   let i = startAt;
   let isClosedObject = false;
   const parsedEntries: IParsedEntry[] = [];
@@ -54,9 +64,13 @@ export const parseJsonObject = (lines: string[], startAt: number): IParseResult 
     }
   }
 
+  if (!isClosedObject) throw new Error('Invalid JSON object');
+
+  const sortedEntries = sortJsonEntries(parsedEntries);
+
   return {
     endAt: i,
-    value: lines[startAt],
+    value: wrapJsonObject(sortedEntries),
   };
 };
 
@@ -77,19 +91,5 @@ export const decideType = (lines: string[], index: number): IStringType => {
 export const parseMakeupJson = (input: string) => {
   const lines = input.split(',\n').map((line) => line.replace(/[\n\t\s]/g, '').trim());
 
-  const startAt = 0;
-  const { type, value } = decideType(lines, startAt);
-  lines[startAt] = value;
-
-  switch (type) {
-    case ECurrentParsedType.JSON: {
-      return parseAndSortJson(lines);
-    }
-    case ECurrentParsedType.ARRAY: {
-      return value;
-    }
-    case ECurrentParsedType.UNKNOWN: {
-      return value;
-    }
-  }
+  return parseParseType(lines);
 };
