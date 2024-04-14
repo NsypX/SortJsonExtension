@@ -66,10 +66,10 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
 
   for (; i < lines.length; i++) {
     const currLine = lines[i];
-    const res = parseObjectLine(currLine);
+    const currEntry = parseObjectLine(currLine);
 
-    if (res) {
-      parsedEntries.push(res);
+    if (currEntry) {
+      parsedEntries.push(currEntry);
     }
 
     if (currLine.endsWith('}')) {
