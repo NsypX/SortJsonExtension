@@ -43,5 +43,3 @@ export const parseAndSortJson = (input: string) => {
 
   return retVal;
 };
-
-const n = 'fds';
