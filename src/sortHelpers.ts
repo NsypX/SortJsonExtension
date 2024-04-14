@@ -1,4 +1,4 @@
-import { IParsedEntry } from './types';
+import type { IParsedEntry } from './types';
 
 const checkIfJsonReturnKeys = (input: string): string => {
   const trimmed = input.trim();
@@ -43,3 +43,5 @@ export const parseAndSortJson = (input: string) => {
 
   return retVal;
 };
+
+const n = 'fds';
