@@ -6,15 +6,16 @@ import { testFunction, INPUTS_MOCKS } from './mockups';
 const wrapJsonObject = (entries: IParsedEntry[]) =>
   `{\n${entries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
 
-const parseObjectLine = (line: string): IParsedEntry | null => {
+const parseObjectLine = (line: string, overrideValue?: string): IParsedEntry | null => {
   const [key, ...values] = line.split(':');
+
   if (values.length === 0) {
     return null;
   }
 
   const value = values.join(':').replace('}', '');
 
-  return { key, value };
+  return { key, value: overrideValue || value };
 };
 
 export const decideType = (lines: string[], index: number): IStringType => {
@@ -28,24 +29,33 @@ export const decideType = (lines: string[], index: number): IStringType => {
 
   if (value.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value: removeFirstChar };
 
+  if (value.indexOf(':') !== -1) {
+    const [_, ...values] = value.split(':');
+    const keyValueValue = values.join(':').trim();
+
+    const removeFirstCharKeyValueValue = keyValueValue.substring(1);
+
+    if (keyValueValue.startsWith('{')) return { type: ECurrentParsedType.JSON, value: removeFirstCharKeyValueValue };
+
+    if (keyValueValue.startsWith('[')) return { type: ECurrentParsedType.ARRAY, value: removeFirstCharKeyValueValue };
+  }
+
   return { type: ECurrentParsedType.UNKNOWN, value };
 };
 
-const parseParseType = (lines: string[], startAt: number = 0): string => {
+const parseParseType = (lines: string[], startAt: number = 0): IParseResult => {
   const { type, value } = decideType(lines, startAt);
   lines[startAt] = value;
 
   switch (type) {
     case ECurrentParsedType.JSON: {
-      const { value } = parseAndSortJson(lines, startAt);
-
-      return value;
+      return parseAndSortJson(lines, startAt);
     }
     case ECurrentParsedType.ARRAY: {
-      return value;
+      return { value, endAt: startAt };
     }
     case ECurrentParsedType.UNKNOWN: {
-      return value;
+      return { value, endAt: startAt };
     }
   }
 };
@@ -69,7 +79,12 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
 
   for (; i < lines.length; i++) {
     const currLine = lines[i];
-    const currEntry = parseObjectLine(currLine);
+    
+    const { endAt, value } = parseParseType(lines, i);
+
+    const currEntry = (i !== endAt) ? parseObjectLine(currLine,value) : parseObjectLine(currLine);
+
+    i = endAt;
 
     if (currEntry) {
       parsedEntries.push(currEntry);
@@ -91,10 +106,11 @@ export const parseAndSortJson = (lines: string[], startAt: number): IParseResult
   };
 };
 
-export const parseMakeupJson = (input: string) => {
+export const parseMakeupJson = (input: string): string => {
   const lines = input.split(',\n').map((line) => line.replace(/[\n\t\s]/g, '').trim());
 
-  return parseParseType(lines);
+  const { value } = parseParseType(lines);
+  return value;
 };
 
-testFunction(INPUTS_MOCKS.SIMPLE_OBJ, parseMakeupJson);
+testFunction(INPUTS_MOCKS.NESTED_OBJ, parseMakeupJson);
