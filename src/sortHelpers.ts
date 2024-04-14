@@ -39,7 +39,7 @@ export const parseAndSortJson = (input: string) => {
     return 0;
   });
 
-  const retVal = `{\n${sortedEntries.map(({ key, value }) => `${key}: ${value},\n`).join('')}\n}`;
+  const retVal = `{\n${sortedEntries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;
 
   return retVal;
 };
