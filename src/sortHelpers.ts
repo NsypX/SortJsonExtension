@@ -1,4 +1,6 @@
-import { ECurrentParsedType, IParseResult, IStringType, type IParsedEntry } from './types';
+import type { IParseResult, IStringType, IParsedEntry } from './types';
+
+import { ECurrentParsedType } from './constants';
 
 const wrapJsonObject = (entries: IParsedEntry[]) =>
   `{\n${entries.map(({ key, value }) => `${key}: ${value},\n`).join('')}}`;

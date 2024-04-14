@@ -6,7 +6,7 @@
     "sourceType": "module",
     "ecmaVersion": 2019
   },
-  "ignorePatterns": ["**/node_modules/**", "**/*coverage*/**", "**/vendor/**", "**/.build/**", "/.vscode", "!/.jest"],
+  "ignorePatterns": ["**/node_modules/**", "**/*coverage*/**", "**/vendor/**", "**/.build/**", "/.vscode", "!/.jest","**/out/**"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
   "settings": {
