@@ -14,3 +14,8 @@ export interface IParseResult {
     endAt: number;
     value: string;
 }
+
+export interface ITestsParams {
+    input: string;
+    expectedValue: string;
+}
