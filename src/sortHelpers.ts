@@ -30,7 +30,7 @@ const parseObjectLine = (line: string, overrideValue?: string): IParsedEntry | n
     return null;
   }
 
-  const value = values.join(':');
+  const value = values.join(':').trim();
 
   return { key, value: overrideValue || value };
 };
@@ -129,8 +129,6 @@ export const parseMakeupJson = (input: string): string => {
     }
   }
 
-  const trimmedLines = lines.map((line) => line.replace(/[\n\t\s]/g, '').trim());
-
-  const { value } = parseParseType(trimmedLines);
+  const { value } = parseParseType(lines);
   return value;
 };

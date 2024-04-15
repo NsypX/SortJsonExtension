@@ -25,8 +25,8 @@
     "keybindings": [
       {
         "command": "json-markup-sort.sortJsonKeys",
-        "key": "f7",
-        "mac": "F7",
+        "key": "f17",
+        "mac": "F17",
         "when": "editorTextFocus"
       }
     ]
